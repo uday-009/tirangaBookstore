@@ -13,6 +13,7 @@ import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
 import { HiOutlineChevronDown } from "react-icons/hi";
 import { HiChevronUp } from "react-icons/hi";
+import useAuth from '../context/AuthContext';
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -23,19 +24,21 @@ const Navbar = () => {
     const [categories, setCategories] = useState(false);
     const [openDropdown, setOpenDropdown] = useState(null);
 
-    const cartItems = useSelector(state => state?.cart?.cartItems)
-    console.log(cartItems, 'cartItems')
+    const cartItems = useSelector(state => state?.cart?.cartItems);
+    const { authData, logout } = useAuth();
+    const user = JSON.parse(authData.user)
+    
+    console.log(cartItems, 'cartItems', authData?.user?.mobile)
     const navbarRef = useRef(null);
     const backToTopButtonRef = useRef(null);
+    const closeButtonRef = useRef(null); 
+    
 
-
-    const toggleMenu = () => {
-        setIsOpen(!isOpen);
-    };
-
-    const showLoginModal = () => {
-        setLoginPopup(true)
-    }
+    useEffect(() => {
+        if (authData.isAuthenticated && closeButtonRef.current) {
+            closeButtonRef.current.click();
+        }
+    },[authData.isAuthenticated])
 
     const fetchCategories = async () => {
         try {
@@ -249,9 +252,14 @@ const Navbar = () => {
                                         <div>
                                             {/* show if user no logged in*/}
                                             <div className="user-access py-4 border-0">
-                                                <button data-modal-target="loginModal" data-modal-toggle="loginModal" className='inline-block text-primary border border-1 p-2 hover:border-primary' type='button'>
+
+                                                {!authData.isAuthenticated && <button data-modal-target="loginModal" data-modal-toggle="loginModal" className='inline-block text-primary border border-1 p-2 hover:border-primary' type='button'>
                                                     LOGIN / SIGNUP
-                                                </button>
+                                                </button>}
+                                                {
+                                                    authData.isAuthenticated && <div className='font-bold'>{user.mobile}</div>
+                                                }
+                                                
 
 
 
@@ -277,10 +285,9 @@ const Navbar = () => {
 
                                             {/* if logged in show logout data */}
                                             <div className="block border-0 border-t-[1px]  p-0 py-2">
-                                                <Link to={"/logout"} className='block text-dim font-secondary text-[14px]'>
+                                                <button onClick={logout} className='block text-dim font-secondary text-[14px]'>
                                                     <div className="block capitalize hover:font-bold">logout</div>
-                                                </Link>
-
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -319,7 +326,7 @@ const Navbar = () => {
                             >
 
                                 {/* Display the category title */}
-                                <div className="flex items-center gap-2  hover:text-primary">
+                                <div className="flex items-center gap-2  hover:text-primary cursor-pointer">
                                     {c.title}
                                     {/* If subcategories exist, display the chevron down */}
                                     {c.subcategories && c.subcategories.length > 0 && (
@@ -331,7 +338,7 @@ const Navbar = () => {
                                     <div className="sub-m absolute left-0 top-[80%] mt-2 p-0 py-2 bg-white border rounded shadow-md w-40  transition-all duration-1000">
                                         <ul>
                                             {c.subcategories.map((sub, subIndex) => (
-                                                <li key={sub._id} className="p-2 capitalize  hover:text-primary">
+                                                <li key={sub._id} className="p-2 capitalize  hover:text-primary cursor-pointer">
                                                     {sub.title}
                                                 </li>
                                             ))}
@@ -346,7 +353,7 @@ const Navbar = () => {
             <div id="loginModal" data-modal-closable={false} tabindex="-1" aria-hidden="true" data-modal-backdrop="static" data-modal-keyboard="false" className="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
                 <div className="relative p-4 w-full max-w-lg max-h-full">
                     <div className="relative bg-white rounded-lg dark:bg-gray-700">
-                        <button type="button" className="absolute top-3 end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center z-10 dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="loginModal">
+                        <button type="button"  ref={closeButtonRef} className="absolute top-3 end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center z-10 dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="loginModal">
                             <svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
                                 <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
                             </svg>
@@ -365,7 +372,7 @@ const Navbar = () => {
                 className={`back-to-top  ${showBackToTop ? 'hidden' : 'fixed bottom-14 right-4 z-50 bg-secondary text-[#fff]'}`}
                 onClick={handleBackToTopClick}
             >
-                <HiChevronUp className='size-18' />
+                <HiChevronUp className='size-10' />
             </button>
         </>
 

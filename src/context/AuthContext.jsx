@@ -1,5 +1,6 @@
 
 import { createContext, useContext, useState, useEffect } from "react";
+import authServices from "../api/auth";
 
 const AuthContext = createContext();
 
@@ -13,37 +14,47 @@ export const AuthProvider = ({ children }) => {
   const [authData, setAuthData] = useState(() => {
     // Get the token from localStorage (or sessionStorage) when app first loads
     const storedToken = localStorage.getItem("token");
+    const storedUser = localStorage.getItem("user");
+    console.log(storedUser)
     if (storedToken) {
       // Decode the token if needed and set user data here
-      return { token: storedToken, isAuthenticated: true };
+      return { user: storedUser, token: storedToken, isAuthenticated: true };
     }
-    return { token: null, isAuthenticated: false };
+    return {user:null, token: null, isAuthenticated: false };
   });
 
-  // Login function: This will send credentials and store token
-  const login = async (email, password) => {
+
+
+  const login = async (phoneNumber,otp) => {
+    console.log('otp login successful', otp)
+    // Make an API call to verify the OTP
     try {
-      // Call the API to get the JWT token (replace this with your API call)
-      const response = await fetch("https://your-api-url.com/login", {
-        method: "POST",
-        body: JSON.stringify({ email, password }),
-        headers: { "Content-Type": "application/json" },
-      });
-      const data = await response.json();
-      if (data.token) {
-        // Save the token to localStorage and update state
-        localStorage.setItem("token", data.token);
-        setAuthData({ token: data.token, isAuthenticated: true });
-      }
+        const {data, status, message} = await authServices.verifyOtp({ username: phoneNumber, otp });
+
+        if (status) {
+            // OTP verified successfully
+            console.log("OTP verified successfully!");
+            localStorage.setItem("user", JSON.stringify(data.user));
+            localStorage.setItem("token", data.token);
+            setAuthData({user: data.user, token: data.token, isAuthenticated: true });
+            // You can update the auth state or navigate the user to the next page
+        } else {
+            // OTP verification failed
+            console.error("OTP verification failed:", message);
+            alert("Invalid OTP. Please try again.");
+        }
+
     } catch (error) {
-      console.error("Login failed:", error);
-    }
-  };
+        console.error("Error verifying OTP:", error);
+        alert("Something went wrong. Please try again.");
+    } 
+}
 
   // Logout function: Clear the token from storage and reset state
   const logout = () => {
     localStorage.removeItem("token");
-    setAuthData({ token: null, isAuthenticated: false });
+    localStorage.removeItem("user");
+    setAuthData({user: null, token: null, isAuthenticated: false });
   };
 
   return (

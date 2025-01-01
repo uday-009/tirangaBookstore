@@ -2,10 +2,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import { HiOutlinePencil } from "react-icons/hi";
 import authServices from '../api/auth';
 
-const OtpInput = ({ length = 4, onOtpSubmit = () => { }, phoneNumber, editNumber }) => {
+const OtpInput = ({ length = 4, onOtpSubmit = () => { }, phoneNumber, editNumber, otpLoading }) => {
 
     const [otp, setOtp] = useState(new Array(length).fill(""));
-    const [timer, setTimer] = useState(60); // Timer state for 60 seconds
+    const [timer, setTimer] = useState(60); 
     const [isResendDisabled, setIsResendDisabled] = useState(true);
 
 
@@ -22,13 +22,13 @@ const OtpInput = ({ length = 4, onOtpSubmit = () => { }, phoneNumber, editNumber
             inputRefs.current[0].focus();
         }
 
-        // Timer logic: Start countdown when OTP page loads
+      
         if (timer > 0 && isResendDisabled) {
             const interval = setInterval(() => {
-                setTimer((prev) => prev - 1); // Decrease timer every second
+                setTimer((prev) => prev - 1); 
             }, 1000);
 
-            // Clear interval when timer reaches 0 or component unmounts
+       
             return () => clearInterval(interval);
         }
 
@@ -100,11 +100,11 @@ const OtpInput = ({ length = 4, onOtpSubmit = () => { }, phoneNumber, editNumber
     };
 
     const handleResendOtp = () => {
-        if (timer === 0) {
+        // if (timer === 0) {
             setTimer(60);
             setIsResendDisabled(true);
             resendOtp();
-        }
+        // }
     };
 
     return (<div>
@@ -162,7 +162,7 @@ const OtpInput = ({ length = 4, onOtpSubmit = () => { }, phoneNumber, editNumber
 
             </div>
             <div className="mt-8">
-                <button type='submit' onClick={() => onOtpSubmit(otp.join(""))} className='bg-secondary text-white font-bold w-full h-[46px] rounded rounded-md hover:shadow-[0_5px_15px_0_rgba(0,0,0,0.15)]'> Continue </button>
+                <button type='submit' onClick={() => onOtpSubmit(otp.join(""))} className='bg-secondary text-white font-bold w-full h-[46px] rounded rounded-md hover:shadow-[0_5px_15px_0_rgba(0,0,0,0.15)]'>   {otpLoading ? 'Loading...' : 'Continue'} </button>
             </div>
         </div>
     </div>

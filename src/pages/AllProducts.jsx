@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
 import BookCard from './books/BookCard'
 import axios from 'axios'
+import { useSelector } from 'react-redux';
 
 const AllProducts = () => {
-    const [books, setBooks] = useState([])
+    const [books, setBooks] = useState([]);
+    const cartItems = useSelector((state) => state.cart.cartItems);
 
     useState(() => {
         // axios.get('http://tiranga.techworrks.com/products')
