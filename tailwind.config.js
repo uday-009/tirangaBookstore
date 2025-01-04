@@ -13,7 +13,10 @@ export default {
         favorite: "#06038D",
         lightGray: "#fafbfc",
         lightFont: "#94969f",
-        dim: "#3e4152"
+        dim: "#3e4152",
+        // primary: "#f6851c",
+        primaryHover: '#e8520c',
+        // secondary: "#16a754",
       },
       fontFamily: {
         secondary: ['Montserrat', 'sans-serif'],

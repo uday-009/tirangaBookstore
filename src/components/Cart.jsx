@@ -1,6 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addToCart, removeFromCart } from '../redux/features/cart/cartSlice'; // Import actions
+import { openModal } from '../redux/slices/modalSlice';
+import useAuth from '../context/AuthContext';
 
 const Cart = () => {
 
@@ -8,8 +10,8 @@ const Cart = () => {
     const [itemToRemove, setItemToRemove] = useState(null);
     const cartItems = useSelector((state) => state.cart.cartItems);
     const dispatch = useDispatch();
-
-
+    const { authData, logout } = useAuth();
+    
     const handleQuantityChange = (item, newQuantity) => {
         if (newQuantity > 0) {
 
@@ -61,8 +63,18 @@ const Cart = () => {
     };
 
     const handlePlaceOrder = () => {
-
+        if(!authData.isAuthenticated){
+            handleLoginClick();
+        }
+        return;
     }
+
+    const handleLoginClick = () => {
+        // Dispatch openModal action with modalType 'login'
+        dispatch(openModal({
+          modalType: 'login',
+        }));
+      };
 
 
 

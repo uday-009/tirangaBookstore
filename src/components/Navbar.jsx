@@ -10,10 +10,11 @@ import { SiApple } from "react-icons/si";
 import Login from './Login';
 import userServices from '../api/user';
 import { toast } from 'react-toastify';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { HiOutlineChevronDown } from "react-icons/hi";
 import { HiChevronUp } from "react-icons/hi";
 import useAuth from '../context/AuthContext';
+import { openModal } from '../redux/slices/modalSlice';
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -23,6 +24,7 @@ const Navbar = () => {
     const [showBackToTop, setShowBackToTop] = useState(false);
     const [categories, setCategories] = useState(false);
     const [openDropdown, setOpenDropdown] = useState(null);
+    const dispatch = useDispatch();
 
     const cartItems = useSelector(state => state?.cart?.cartItems);
     const { authData, logout } = useAuth();
@@ -168,6 +170,13 @@ const Navbar = () => {
 
     ]
 
+    const handleLoginClick = () => {
+        // Dispatch openModal action with modalType 'login'
+        dispatch(openModal({
+          modalType: 'login',
+        }));
+      };
+
     return (
 
         <>
@@ -253,7 +262,7 @@ const Navbar = () => {
                                             {/* show if user no logged in*/}
                                             <div className="user-access py-4 border-0">
 
-                                                {!authData.isAuthenticated && <button data-modal-target="loginModal" data-modal-toggle="loginModal" className='inline-block text-primary border border-1 p-2 hover:border-primary' type='button'>
+                                                {!authData.isAuthenticated && <button onClick={handleLoginClick} className='inline-block text-primary border border-1 p-2 hover:border-primary' type='button'>
                                                     LOGIN / SIGNUP
                                                 </button>}
                                                 {

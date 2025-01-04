@@ -4,12 +4,14 @@ import { addToCart } from '../../redux/features/cart/cartSlice';
 import { FiShoppingBag, FiCheckCircle } from "react-icons/fi";
 import useAuth from '../../context/AuthContext';
 import userServices from '../../api/user';
+import { useNavigate } from 'react-router-dom';
 
 const BookCard = ({ book, bookInCart = false }) => {
     const { authData } = useAuth();
     const user = authData?.user;
 
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     // Handle image URL state
     const [imageUrl, setImageUrl] = useState(book?.images[0]?.image || null);
@@ -32,7 +34,7 @@ const BookCard = ({ book, bookInCart = false }) => {
 
     const handleAddToCart = async (product) => {
         setIsAdding(true);
-        
+
         if (user) {
             try {
                 const res = await userServices.addToCart({ product_id: product._id, quantity: 1 });
@@ -51,11 +53,26 @@ const BookCard = ({ book, bookInCart = false }) => {
 
         } else {
             const productWithQuantity = { ...product, quantity: 1 };
+            
+            
+            let cartItems = JSON.parse(localStorage.getItem("cartItems")) || []; // Get cart items from localStorage
+
+            const existingItem = cartItems.find(item => item._id === productWithQuantity._id);
+
+            if (existingItem) {
+                // Update quantity of the existing item
+                existingItem.quantity = productWithQuantity.quantity;
+            } else {
+                // Add new item if it doesn't exist
+                cartItems.push(productWithQuantity);
+            }
+            // Save updated cart to localStorage
+            localStorage.setItem("cartItems", JSON.stringify(cartItems));
+
+            // Dispatch to Redux store
             dispatch(addToCart(productWithQuantity));
             setIsAdded(true);
-            // const updatedCartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
-            // updatedCartItems.push(productWithQuantity);
-            // localStorage.setItem('cartItems', JSON.stringify(updatedCartItems));
+        
         }
 
         setIsAdding(false);
@@ -112,9 +129,9 @@ const BookCard = ({ book, bookInCart = false }) => {
                     </button> */}
                     {isAdded ? (
                         <button
-                            className="btn-secondary bg-green-500 text-white w-full uppercase px-4 py-2 mb-4 flex justify-center items-center gap-1"
+                            className="btn-primary bg-primary text-white w-full uppercase px-4 py-2 mb-4 flex justify-center items-center gap-1"
                             onClick={HandleNavigateToCart}
-                            style={{ fontSize: "14px", padding: "6px", border: "2px solid green" }}
+                            style={{ fontSize: "14px", padding: "6px",  }}
                         >
                             <FiCheckCircle size={16} />
                             <span>Go to Cart</span>

@@ -113,11 +113,11 @@ const OtpInput = ({ length = 4, onOtpSubmit = () => { }, phoneNumber, editNumber
 
 
             <div>
-                <div className='text-[18px] font-[400] text-[#111] flex items-center justify-start'>
+                <div className='text-[18px] font-[400] text-[#111] flex items-center justify-start gap-1'>
                     Enter the code sent to
 
                     <span className='pl-[12px] font-[600]'>
-                        + 91 -
+                       {" + 91 - "}
                     </span>
                     <span className=' font-[600]'>
 

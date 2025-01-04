@@ -4,6 +4,7 @@ import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import Login from './components/Login'
 import { AuthProvider } from './context/AuthContext'
+import ModalComponent from './components/modalComponent'
 
 function App() {
 
@@ -18,6 +19,7 @@ function App() {
 
         {/* <Login /> */}
         <Footer />
+        <ModalComponent />
       </AuthProvider>
     </>
   )

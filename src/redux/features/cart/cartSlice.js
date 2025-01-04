@@ -15,11 +15,11 @@ const cartSlice = createSlice({
             if (existingItem) {
                 // Update quantity of the existing item
                 existingItem.quantity = action.payload.quantity;
-                localStorage.setItem("cartItems", JSON.stringify(state.cartItems));  // Save to localStorage
+                // localStorage.setItem("cartItems", JSON.stringify(state.cartItems));  // Save to localStorage
             } else {
                 // Add new item if it doesn't exist
                 state.cartItems.push(action.payload);
-                localStorage.setItem("cartItems", JSON.stringify(state.cartItems)); // Save to localStorage
+                // localStorage.setItem("cartItems", JSON.stringify(state.cartItems)); // Save to localStorage
             }
         },
         removeFromCart: (state, action) => {
@@ -29,11 +29,15 @@ const cartSlice = createSlice({
         clearCart: (state) => {
             state.cartItems = [];
             localStorage.removeItem("cartItems");
+        }, 
+        setCart: (state, action) => {
+            state.cartItems = action.payload;
+            localStorage.removeItem("cartItems");
         }
     }
 })
 
 
 // export the actions
-export const { addToCart, removeFromCart, clearCart } = cartSlice.actions;
+export const { addToCart, removeFromCart, clearCart, setCart } = cartSlice.actions;
 export default cartSlice.reducer
