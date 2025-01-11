@@ -1,17 +1,15 @@
-import React, { useEffect, useState, useMemo } from 'react';
-import { useDispatch } from 'react-redux';
-import { addToCart } from '../../redux/features/cart/cartSlice';
-import { FiShoppingBag, FiCheckCircle } from "react-icons/fi";
-import useAuth from '../../context/AuthContext';
-import userServices from '../../api/user';
-import { useNavigate } from 'react-router-dom';
-import { HiOutlineHeart } from "react-icons/hi";
-import { addToWishlist } from '../../redux/slices/wishlistSlice';
-import { openModal } from '../../redux/slices/modalSlice';
+import { useDispatch, useSelector } from "react-redux";
+import useAuth from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { useMemo, useState } from "react";
 
-const BookCard = ({ book, bookInCart = false, inWishList = false }) => {
+
+const Singlewish = ({ book, bookInCart = false, inWishList = false }) => {
+
     const { authData } = useAuth();
     const user = authData?.user;
+    const wishlistItems = useSelector(state => state.wishlist);
+    
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -56,8 +54,8 @@ const BookCard = ({ book, bookInCart = false, inWishList = false }) => {
 
         } else {
             const productWithQuantity = { ...product, quantity: 1 };
-
-
+            
+            
             let cartItems = JSON.parse(localStorage.getItem("cartItems")) || []; // Get cart items from localStorage
 
             const existingItem = cartItems.find(item => item._id === productWithQuantity._id);
@@ -75,7 +73,7 @@ const BookCard = ({ book, bookInCart = false, inWishList = false }) => {
             // Dispatch to Redux store
             dispatch(addToCart(productWithQuantity));
             setIsAdded(true);
-
+        
         }
 
         setIsAdding(false);
@@ -84,36 +82,10 @@ const BookCard = ({ book, bookInCart = false, inWishList = false }) => {
     const HandleNavigateToCart = () => {
         navigate('/cart');
     };
-
-    const handleAddToWishList = async (book) => {
-        try {
-            if (!user) {
-                handleLoginClick()
-                return;
-            }
-            const res = await userServices.addToWishList(book?._id);
-            if (res.status) {
-                console.log(res)
-                dispatch(addToWishlist(book));
-            }
-        } catch (error) {
-            console.error('error adding to wishlist:', error)
-        }
-    };
-
-    const handleLoginClick = () => {
-        // Dispatch openModal action with modalType 'login'
-        dispatch(openModal({
-            modalType: 'login',
-        }));
-    };
-    
-
-
-    return (
+    return(
         <div className="transition-shadow hover:shadow-[0_2px_16px_4px_rgba(40,44,63,.07)] hover:scale-[1.01] duration-200 w-[180px] md:w-[210px]  box-border mx-[10px] mt-0 mb-[30px]">
             <div className="flex sm:flex-row sm:items-center sm:h-76 sm:justify-center md:flex-col">
-                <div className="sm:h-72 w-full sm:flex-shrink-0 relative">
+                <div className="sm:h-72 w-full sm:flex-shrink-0">
                     <a href="/">
                         {imageUrl ? (
                             <img
@@ -128,7 +100,6 @@ const BookCard = ({ book, bookInCart = false, inWishList = false }) => {
                             </div>
                         )}
                     </a>
-                    <span onClick={() => handleAddToWishList(book)} className={`cursor-pointer rounded p-2 absolute top-2 right-2 ${inWishList ? 'bg-[#ff3f6c]' : 'bg-white'} `}> <HiOutlineHeart className={`${inWishList ? 'text-white' : ''} `} /> </span>
                 </div>
 
                 <div className='mt-3 w-full px-[10px]'>
@@ -159,7 +130,7 @@ const BookCard = ({ book, bookInCart = false, inWishList = false }) => {
                         <button
                             className="btn-primary bg-primary text-white w-full uppercase px-4 py-2 mb-4 flex justify-center items-center gap-1"
                             onClick={HandleNavigateToCart}
-                            style={{ fontSize: "14px", padding: "6px", }}
+                            style={{ fontSize: "14px", padding: "6px",  }}
                         >
                             <FiCheckCircle size={16} />
                             <span>Go to Cart</span>
@@ -181,7 +152,7 @@ const BookCard = ({ book, bookInCart = false, inWishList = false }) => {
                 </div>
             </div>
         </div>
-    );
+    )
 }
 
-export default BookCard;
+export default Singlewish;

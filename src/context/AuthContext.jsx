@@ -4,6 +4,7 @@ import authServices from "../api/auth";
 import userServices from "../api/user";
 import { setCart } from '../redux/features/cart/cartSlice';
 import { useDispatch } from "react-redux";
+import { setWishlist } from "../redux/slices/wishlistSlice";
 
 const AuthContext = createContext();
 
@@ -37,6 +38,17 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const fetchWishList = async () => {
+    if (authData.isAuthenticated) {
+      try {
+        const response = await userServices.getWishList(); // API call to fetch wishlist
+        dispatch(setWishlist(response.data)); 
+      } catch (error) {
+        console.error("Error fetching wishlist:", error);
+      }
+    }
+  };
+
   const syncCartWithBackend = async () => {
     if (authData.isAuthenticated && localStorage.getItem("cart")) {
       const localCart = JSON.parse(localStorage.getItem("cart"));
@@ -44,6 +56,7 @@ export const AuthProvider = ({ children }) => {
         await userServices.syncCart(localCart); // Sync cart with backend
         localStorage.removeItem("cart"); // Clear local cart once synced
         fetchCart(); // Fetch updated cart from backend
+        fetchWishList();
       } catch (error) {
         console.error("Error syncing cart:", error);
       }
@@ -87,6 +100,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     if (authData.isAuthenticated) {
       fetchCart();
+      fetchWishList();
     } else if (localStorage.getItem("cart")) {
       syncCartWithBackend();
     }

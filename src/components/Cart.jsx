@@ -1,8 +1,11 @@
 import React, { useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { addToCart, removeFromCart } from '../redux/features/cart/cartSlice'; // Import actions
+import { addToCart, removeFromCart } from '../redux/features/cart/cartSlice'; 
 import { openModal } from '../redux/slices/modalSlice';
 import useAuth from '../context/AuthContext';
+import { RiBookMarkedLine } from "react-icons/ri";
+import { HiChevronRight } from "react-icons/hi";
+import { Link } from 'react-router-dom';
 
 const Cart = () => {
 
@@ -11,7 +14,7 @@ const Cart = () => {
     const cartItems = useSelector((state) => state.cart.cartItems);
     const dispatch = useDispatch();
     const { authData, logout } = useAuth();
-    
+
     const handleQuantityChange = (item, newQuantity) => {
         if (newQuantity > 0) {
 
@@ -63,7 +66,7 @@ const Cart = () => {
     };
 
     const handlePlaceOrder = () => {
-        if(!authData.isAuthenticated){
+        if (!authData.isAuthenticated) {
             handleLoginClick();
         }
         return;
@@ -72,9 +75,9 @@ const Cart = () => {
     const handleLoginClick = () => {
         // Dispatch openModal action with modalType 'login'
         dispatch(openModal({
-          modalType: 'login',
+            modalType: 'login',
         }));
-      };
+    };
 
 
 
@@ -96,7 +99,7 @@ const Cart = () => {
                                         <div key={item._id} className="relative cart-item border rounded px-[8px] pt-[12px] pb-[1px] flex flex-wrap">
                                             <div className='cart-item-left absolute'>
 
-                                                {item.images[0]?.image ? (
+                                                {item.images && item?.images[0]?.image ? (
                                                     <img
                                                         src={item.images[0]?.image}
                                                         alt="Book cover"
@@ -151,6 +154,12 @@ const Cart = () => {
                                 )
                             })}
                         </div>
+                        <Link to={'/wishlist'} className=' border  rounded flex items-center justify-between p-4 mt-6'>
+                            <span className='flex items-center justify-start gap-2 capitalize'>
+                                <RiBookMarkedLine />
+                                <span className='hover:underline font-semibold' > add more from wishlist </span>
+                            </span>
+                            <HiChevronRight size={24} /> </Link>
                     </div>
                     <div className='totalBox basis-[36%] pl-[12px] block'>
                         <div className='text-[14px]  '>

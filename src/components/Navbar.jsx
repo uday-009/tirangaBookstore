@@ -15,6 +15,7 @@ import { HiOutlineChevronDown } from "react-icons/hi";
 import { HiChevronUp } from "react-icons/hi";
 import useAuth from '../context/AuthContext';
 import { openModal } from '../redux/slices/modalSlice';
+import { fetchCategories } from '../redux/slices/categoriesSlice';
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -22,45 +23,32 @@ const Navbar = () => {
     const [loginPopup, setLoginPopup] = useState(false);
     const [isSticky, setIsSticky] = useState(false);
     const [showBackToTop, setShowBackToTop] = useState(false);
-    const [categories, setCategories] = useState(false);
+   
+    const { data: categories, loading, error } = useSelector((state) => state.categories);
+    console.log(categories)
     const [openDropdown, setOpenDropdown] = useState(null);
     const dispatch = useDispatch();
 
     const cartItems = useSelector(state => state?.cart?.cartItems);
     const { authData, logout } = useAuth();
-    const user = JSON.parse(authData.user)
-    
+    const user = JSON.parse(authData?.user)
+    // const user = authData?.user;
+
     console.log(cartItems, 'cartItems', authData?.user?.mobile)
     const navbarRef = useRef(null);
     const backToTopButtonRef = useRef(null);
-    const closeButtonRef = useRef(null); 
-    
+    const closeButtonRef = useRef(null);
+
 
     useEffect(() => {
         if (authData.isAuthenticated && closeButtonRef.current) {
             closeButtonRef.current.click();
         }
-    },[authData.isAuthenticated])
-
-    const fetchCategories = async () => {
-        try {
-            const res = await userServices.getCategories();
-            if (res.status) {
-                setCategories(res.data);
-            } else {
-                toast.error('error occurred');
-                console.error(res, 'error')
-            }
-
-        } catch (error) {
-            toast.error('error occurred');
-            console.error('error: ', error)
-        }
-    }
+    }, [authData.isAuthenticated])
 
 
     useEffect(() => {
-        fetchCategories();
+        dispatch(fetchCategories());
         const navbar = navbarRef.current;
         const backToTopButton = backToTopButtonRef.current;
 
@@ -173,9 +161,9 @@ const Navbar = () => {
     const handleLoginClick = () => {
         // Dispatch openModal action with modalType 'login'
         dispatch(openModal({
-          modalType: 'login',
+            modalType: 'login',
         }));
-      };
+    };
 
     return (
 
@@ -268,7 +256,7 @@ const Navbar = () => {
                                                 {
                                                     authData.isAuthenticated && <div className='font-bold'>{user.mobile}</div>
                                                 }
-                                                
+
 
 
 
@@ -327,34 +315,50 @@ const Navbar = () => {
             <div className='px-2 container md:px-20 text-[#fff] min-w-full border-0 border-t-[1px] border-t-[rgba(0,0,0,.08)] shadow-[0_4px_12px_0_rgba(0,0,0,0.05)]'>
                 <div className='flex justify-between'>
                     <div className='flex justify-start items-center'>
+                       { loading?  <div>loading categories... </div> : 
                         <ul className='flex items-center text-[#000]'>
-                            {categories && categories.map((c, i) => <li id={c?._id} key={c?._id} className='px-2 py-2  mx-2 relative  text-secondary uppercase  font-medium text-[14px]'
-                                onMouseEnter={() => handleMouseEnter(i)}
-                                // onClick={() => handleMouseEnter(i)}
-                                onMouseLeave={handleMouseLeave}
-                            >
+                            {categories && categories.map((c, i) => {
 
-                                {/* Display the category title */}
-                                <div className="flex items-center gap-2  hover:text-primary cursor-pointer">
-                                    {c.title}
-                                    {/* If subcategories exist, display the chevron down */}
-                                    {c.subcategories && c.subcategories.length > 0 && (
-                                       <HiOutlineChevronDown />
-                                    )}
-                                </div>
-                                {/* If subcategories exist, show dropdown  */}
-                                {c.subcategories && c.subcategories.length > 0 && openDropdown === i && (
-                                    <div className="sub-m absolute left-0 top-[80%] mt-2 p-0 py-2 bg-white border rounded shadow-md w-40  transition-all duration-1000">
-                                        <ul>
-                                            {c.subcategories.map((sub, subIndex) => (
-                                                <li key={sub._id} className="p-2 capitalize  hover:text-primary cursor-pointer">
-                                                    {sub.title}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>)}
-                            </li>)}
-                        </ul>
+                                const slug = c.title.toLowerCase().replace(/\s+/g, '-');
+                                const linkUri = `/allproducts/${slug}-${c._id}`;
+
+
+
+                                return (<li id={c?._id} key={c?._id} className='px-2 py-2  mx-2 relative  text-secondary uppercase  font-medium text-[14px]'
+                                    onMouseEnter={() => handleMouseEnter(i)}
+                                    // onClick={() => handleMouseEnter(i)}
+                                    onMouseLeave={handleMouseLeave}
+                                >
+
+                                    {/* Display the category title */}
+                                    <Link to={linkUri} className="flex items-center gap-2  hover:text-primary cursor-pointer">
+                                        {c.title}
+                                        {/* If subcategories exist, display the chevron down */}
+                                        {c.subcategories && c.subcategories.length > 0 && (
+                                            <HiOutlineChevronDown />
+                                        )}
+                                    </Link>
+                                    {/* If subcategories exist, show dropdown  */}
+                                    {c.subcategories && c.subcategories.length > 0 && openDropdown === i && (
+                                        <div className="sub-m absolute left-0 top-[80%] mt-2 p-0 py-2 bg-white border rounded shadow-md w-40  transition-all duration-1000">
+                                            <ul>
+                                                {c.subcategories.map((sub, subIndex) => {
+                                                    const subSlug = sub.title.toLowerCase().replace(/\s+/g, '-');
+                                                    const subLinkUri = `/allproducts/${subSlug}-${sub._id}`;
+
+                                                    return (
+                                                        <li key={sub._id} className="p-2 capitalize  hover:text-primary cursor-pointer">
+                                                            <Link to={subLinkUri}>
+                                                                {sub.title}
+                                                            </Link>
+                                                        </li>
+                                                    )
+                                                })}
+                                            </ul>
+                                        </div>)}
+                                </li>)
+                            })}
+                        </ul>}
                     </div>
                 </div>
             </div>
@@ -362,7 +366,7 @@ const Navbar = () => {
             <div id="loginModal" data-modal-closable={false} tabindex="-1" aria-hidden="true" data-modal-backdrop="static" data-modal-keyboard="false" className="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
                 <div className="relative p-4 w-full max-w-lg max-h-full">
                     <div className="relative bg-white rounded-lg dark:bg-gray-700">
-                        <button type="button"  ref={closeButtonRef} className="absolute top-3 end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center z-10 dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="loginModal">
+                        <button type="button" ref={closeButtonRef} className="absolute top-3 end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center z-10 dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="loginModal">
                             <svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
                                 <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
                             </svg>

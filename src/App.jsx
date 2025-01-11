@@ -12,14 +12,17 @@ function App() {
   return (
     <>
       <AuthProvider >
-        <Navbar />
-        <main className='main min-h-screen max-w-screen-2xl mx-auto px-20 py-6'>
-          <Outlet />
-        </main>
+        <div className=' min-h-screen max-w-screen-2xl'>
 
-        {/* <Login /> */}
-        <Footer />
-        <ModalComponent />
+          <Navbar />
+          <main className='main h-full mx-auto px-20 py-6'>
+            <Outlet />
+          </main>
+
+          {/* <Login /> */}
+          <Footer />
+          <ModalComponent />
+        </div>
       </AuthProvider>
     </>
   )

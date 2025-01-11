@@ -7,6 +7,7 @@ const GetHome = () => {
     const [home, setHome] = useState([]);
     const [books, setBooks] = useState([]);
     const cartItems = useSelector((state) => state.cart.cartItems);
+    const wishlistItems = useSelector(state => state.wishlist)
 
     const fetchHome = async () => {
         try {
@@ -24,8 +25,17 @@ const GetHome = () => {
     }, [])
 
     const isBookInCart = (bookId) => {
+        // cartItems.some((item) => {
+        //     console.log(`${item._id} === ${bookId}`, item._id === bookId)
+        //     return item._id === bookId});
+
+
         return cartItems.some((item) => item._id === bookId);
     };
+
+    const isBookInWishList = (bookId) => {
+        return wishlistItems.some((item) => item._id === bookId)
+    }
 
     const BookSection = ({ section }) => {
         return (
@@ -33,7 +43,7 @@ const GetHome = () => {
                 <h2 className="text-2xl font-semibold mb-4">{section.title}</h2>
                 <div className="books-container flex flex-wrap gap-1">
                     {section.data.map((book) => (
-                        <BookCard key={book._id} book={book} bookInCart={isBookInCart(book._id)} />
+                        <BookCard key={book._id} book={book} bookInCart={isBookInCart(book._id)} inWishList={isBookInWishList(book._id)} />
                     ))}
                 </div>
             </div>
